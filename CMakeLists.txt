@@ -46,3 +46,9 @@ target_link_libraries(config_demo
     ${Boost_LIBRARIES}
 
     )        
+
+
+# Config Demo
+# ============
+
+add_executable(smart_pointer_member_demo src/smart_pointer_member_demo.cpp)
