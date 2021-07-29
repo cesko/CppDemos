@@ -10,7 +10,9 @@
  */
 
 #include <iostream>
-#include <memory>
+#include <memory> // for smart pointers
+#include <type_traits> // for static asserts
+
 
 #define DO_IT(MSG,CMD) { std::cout << "\n# " MSG << ":\n# " #CMD << std::endl; CMD }
 
@@ -41,28 +43,39 @@ struct Apple : public Fruit
     }
 };
 
-struct Banana : public Fruit
+struct Orange : public Fruit
 {
-    Banana () { std::cout << "Banana Created" << std::endl; }
+    Orange () { std::cout << "Orange Created" << std::endl; }
 
-    ~Banana () { std::cout << "Banana Destroyed" << std::endl; }
+    ~Orange () { std::cout << "Orange Destroyed" << std::endl; }
 
-    Banana ( const Banana& other ) { std::cout << "Banana Copied" << std::endl; }
+    Orange ( const Orange& other ) { std::cout << "Orange Copied" << std::endl; }
 
-    Banana& operator= ( const Banana& other ) { std::cout << "Banana Copied" << std::endl; }
+    Orange& operator= ( const Orange& other ) { std::cout << "Orange Copied" << std::endl; }
 
-    Banana ( const Banana&& other ) { std::cout << "Banana Moved" << std::endl; }
+    Orange ( const Orange&& other ) { std::cout << "Orange Moved" << std::endl; }
 
-    Banana& operator= ( const Banana&& other ) { std::cout << "Banana Moved" << std::endl; }
+    Orange& operator= ( const Orange&& other ) { std::cout << "Orange Moved" << std::endl; }
 
     // 
 
     void eat()
     {
-        std::cout << "This banana is delicious!" << std::endl;
+        std::cout << "This orange is delicious!" << std::endl;
     }
 };
 
+struct NotFruit
+{
+    void eat()
+    {
+        std::cout << "This is not fruit!" << std::endl;
+    }
+};
+
+/**
+ * @brief A Basket can hold a reference to any fruit (polymorphic example)
+ */
 struct Basket
 {
     std::shared_ptr<Fruit> m_fruit;
@@ -72,23 +85,35 @@ struct Basket
     template <typename F>
     Basket ( std::shared_ptr<F> fruit )
             : m_fruit( fruit )
-    { std::cout << "Basket Created (with constructor Basket( std::shared_ptr<F> fruit))" << std::endl; }
+    { 
+        static_assert (std::is_base_of<Fruit, F>::value,
+            "Template argument F must be derived from Fruit");
+        std::cout << "Basket Created (with constructor Basket( std::shared_ptr<F> fruit))" << std::endl; 
+    }
 
     template <typename F>
     Basket ( const F& fruit )
             : m_fruit( std::make_shared<F>(fruit) )
-    { std::cout << "Basket Created (with constructor Basket(const F& fruit))" << std::endl; }
+    {
+        static_assert (std::is_base_of<Fruit, F>::value,
+            "Template argument F must be derived from Fruit");
+        std::cout << "Basket Created (with constructor Basket(const F& fruit))" << std::endl; 
+    }
 
     template <typename F>
     Basket ( const F&& fruit )
             : m_fruit( std::make_shared<F>(std::move(fruit)) )
-    { std::cout << "Basket Created (with constructor Basket(const F&& fruit))" << std::endl; }
+    { 
+        static_assert (std::is_base_of<Fruit, F>::value,
+            "Template argument F must be derived from Fruit");
+        std::cout << "Basket Created (with constructor Basket(const F&& fruit))" << std::endl; 
+    }
 
     ~Basket () { std::cout << "Basket Destroyed" << std::endl; }
 
     Basket ( const Basket& other ) { std::cout << "Basket Copied" << std::endl; }
 
-    Basket& operator= ( const Banana& other ) { std::cout << "Basket Copied" << std::endl; }
+    Basket& operator= ( const Basket& other ) { std::cout << "Basket Copied" << std::endl; }
 
     Basket ( const Basket&& other ) { std::cout << "Basket Moved" << std::endl; }
 
@@ -177,6 +202,12 @@ int main ()
         ApplePie pie = ApplePie( Apple() );
         pie.eat();
     );
+
+    // THE FOLLOWING SHOULD NOT COMPILE!
+    NotFruit n = NotFruit(); std::shared_ptr<NotFruit> p_n = std::make_shared<NotFruit>();
+    //Basket b ( n );
+    //Basket b = Basket(NotFruit());
+    //Basket b ( p_n );
 
 }
 
