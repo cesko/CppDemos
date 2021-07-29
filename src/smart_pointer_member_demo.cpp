@@ -180,8 +180,14 @@ int main ()
         b.eat();
     );
 
-    DO_IT ( "Provide a shared pointer",
+    DO_IT ( "Provide a shared pointer (derived class)",
         std::shared_ptr<Apple> p_a = std::make_shared<Apple>();
+        Basket b (p_a);
+        b.eat();
+    );
+
+    DO_IT ( "Provide a shared pointer (base class)",
+        std::shared_ptr<Fruit> p_a = std::make_shared<Apple>();
         Basket b (p_a);
         b.eat();
     );
