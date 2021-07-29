@@ -84,11 +84,56 @@ struct Basket
             : m_fruit( std::make_shared<F>(std::move(fruit)) )
     { std::cout << "Basket Created (with constructor Basket(const F&& fruit))" << std::endl; }
 
-    // ~Basket () { std::cout << "Basket Destroyed" << std::endl; }
+    ~Basket () { std::cout << "Basket Destroyed" << std::endl; }
+
+    Basket ( const Basket& other ) { std::cout << "Basket Copied" << std::endl; }
+
+    Basket& operator= ( const Banana& other ) { std::cout << "Basket Copied" << std::endl; }
+
+    Basket ( const Basket&& other ) { std::cout << "Basket Moved" << std::endl; }
+
+    Basket& operator= ( const Basket&& other ) { std::cout << "Basket Moved" << std::endl; }
 
     void eat ()
     {
         m_fruit -> eat();
+    }    
+};
+
+/**
+ * @brief The ApplePie can only hold a reference to an apple (non-polymorphic example)
+ */
+struct ApplePie
+{
+    std::shared_ptr<Apple> m_apple;
+
+    ApplePie () : m_apple(nullptr) {}
+
+    ApplePie ( std::shared_ptr<Apple> apple )
+            : m_apple( apple )
+    { std::cout << "ApplePie Created (with constructor ApplePie( std::shared_ptr<Apple> apple))" << std::endl; }
+
+    ApplePie ( const Apple& apple )
+            : m_apple( std::make_shared<Apple>(apple) )
+    { std::cout << "ApplePie Created (with constructor ApplePie(const Apple& apple))" << std::endl; }
+
+    ApplePie ( const Apple&& apple )
+            : m_apple( std::make_shared<Apple>(std::move(apple)) )
+    { std::cout << "ApplePie Created (with constructor ApplePie(const Apple&& apple))" << std::endl; }
+
+    ~ApplePie () { std::cout << "ApplePie Destroyed" << std::endl; }
+
+    ApplePie ( const ApplePie& other ) { std::cout << "ApplePie Copied" << std::endl; }
+
+    ApplePie& operator= ( const ApplePie& other ) { std::cout << "ApplePie Copied" << std::endl; }
+
+    // ApplePie ( const ApplePie&& other ) { std::cout << "ApplePie Moved" << std::endl; }
+
+    // ApplePie& operator= ( const ApplePie&& other ) { std::cout << "ApplePie Moved" << std::endl; }
+
+    void eat ()
+    {
+        m_apple -> eat();
     }    
 };
 
@@ -127,5 +172,11 @@ int main ()
         }
         std::cout << "apple use counter: " << p_a.use_count() << std::endl;
     );
+
+    DO_IT ( "ApplePie: Provide rvalue reference to object",
+        ApplePie pie = ApplePie( Apple() );
+        pie.eat();
+    );
+
 }
 
