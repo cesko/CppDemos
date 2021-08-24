@@ -57,3 +57,8 @@ add_executable(smart_pointer_member_demo src/smart_pointer_member_demo.cpp)
 # =================
 
 add_executable(polymorphism_demo src/polymorphism_demo.cpp)
+
+# Chrono Demo
+# =================
+
+add_executable(chrono_demo src/chrono_demo.cpp)
