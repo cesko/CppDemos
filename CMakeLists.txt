@@ -48,7 +48,12 @@ target_link_libraries(config_demo
     )        
 
 
-# Config Demo
-# ============
+# Smart Pointer Demo
+# ==================
 
 add_executable(smart_pointer_member_demo src/smart_pointer_member_demo.cpp)
+
+# Polymorphism Demo
+# =================
+
+add_executable(polymorphism_demo src/polymorphism_demo.cpp)
