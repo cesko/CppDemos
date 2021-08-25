@@ -2,8 +2,48 @@
 #include <iostream>
 #include <type_traits>
 
+// Usefull Classes
+// ===============
+
+class StopWatch
+{
+protected:
+
+    std::string m_name;
+
+    std::chrono::time_point<std::chrono::steady_clock> mt_start;
+    
+    
+public:
+    
+    StopWatch(const std::string& name = "")
+    : m_name(name), mt_start(std::chrono::steady_clock::now())
+    {}
+
+    ~StopWatch()
+    {
+        auto t_end = std::chrono::steady_clock::now();
+        auto td = t_end - mt_start;
+        log(td);
+    }
+
+    virtual void log(std::chrono::nanoseconds td)
+    {
+        // print in ms;
+        double sec = td.count() * 1e-9;
+        
+        if (m_name == "")
+            std::cout << "[StopWatch] " <<  sec << " s" << std::endl;
+        else
+            std::cout << "[StopWarch] " << m_name << ": " << sec << " s" << std::endl;
+    }
+
+};
+
+
 // Measure Time
 // ============
+
 
 int isPrime(unsigned int p)
 {
@@ -45,6 +85,7 @@ void measureExecutionTime()
 {
     std::cout << "MEASURE TIME\n";
 
+    std::cout << "Option 1: Directly\n";
     std::chrono::time_point<std::chrono::steady_clock> t_start = std::chrono::steady_clock::now();
 
     uint p_max = 150000;
@@ -56,6 +97,13 @@ void measureExecutionTime()
     std::cout << "There are " << n << " primes up to a value of " << p_max << "." << std::endl;
     std::cout << "This operation took " << td_s.count() << "s." << std::endl;
 
+
+    std::cout << "Option 2: Using Scoped Stop Watch\n";    
+    {
+        StopWatch stw("Count Primes");
+        auto n = countPrimes(p_max);
+    }
+    
     std::cout << std::endl;
 }
 
